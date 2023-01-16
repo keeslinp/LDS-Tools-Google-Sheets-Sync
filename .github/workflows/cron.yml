@@ -1,0 +1,21 @@
+name: Cron
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment:
+      name: Painted Mountain
+    steps:
+    - name: Download artifact
+      id: download-artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: rust.yml
+        workflow_conclusion: success
+        branch: master
+    - name: Run Sync
+      id: run-sync
+      run: target/release/lds-secretary
