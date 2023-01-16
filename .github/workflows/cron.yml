@@ -18,4 +18,4 @@ jobs:
         branch: master
     - name: Run Sync
       id: run-sync
-      run: lds-secretary
+      run: ${GITHUB_WORKSPACE}/lds-secretary
