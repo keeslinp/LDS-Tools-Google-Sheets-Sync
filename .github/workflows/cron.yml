@@ -18,4 +18,4 @@ jobs:
         branch: master
     - name: Run Sync
       id: run-sync
-      run: ${GITHUB_WORKSPACE}/lds-secretary
+      run: ${GITHUB_WORKSPACE}/target/release/lds-secretary
