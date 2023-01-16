@@ -16,6 +16,9 @@ jobs:
         workflow: rust.yml
         workflow_conclusion: success
         branch: master
+    - name: Make Executable
+      id: make-executable
+      run: chmod +x Binary/lds-secretary
     - name: Run Sync
       id: run-sync
       run: Binary/lds-secretary
