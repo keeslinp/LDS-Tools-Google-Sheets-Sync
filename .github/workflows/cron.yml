@@ -19,6 +19,14 @@ jobs:
     - name: Make Executable
       id: make-executable
       run: chmod +x Binary/lds-secretary
+    - name: Write creds.json file
+      id: write-creds
+      env:
+        CREDS_DATA: ${{ secrets.CREDS_DATA }}
+      run: echo $CREDS_DATA > conf.json
     - name: Run Sync
       id: run-sync
+      env:
+        LDS_USERNAME: ${{ secrets.LDS_USERNAME }}
+        LDS_PASSWORD: ${{ secrets.LDS_PASSWORD }}
       run: Binary/lds-secretary
