@@ -143,6 +143,17 @@ impl<'a> SpreadSheet<'a> {
         }
     }
 
+    pub fn sheet_by_title<'b: 'a>(&'b self, name: impl AsRef<str>) -> Option<Sheet<'a, 'b>> {
+        self.data
+            .sheets
+            .iter()
+            .find(|sheet| sheet.properties.title == name.as_ref())
+            .map(|data| Sheet {
+                data,
+                spread_sheet: self,
+            })
+    }
+
     async fn append(&self, range: impl AsRef<str>, rows: Vec<Vec<&str>>) -> Result<()> {
         self.api.append(self.id.as_str(), range, rows).await?;
         Ok(())

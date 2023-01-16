@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use lds_api::LDSApi;
 
 mod auth;
@@ -18,7 +18,14 @@ async fn main() -> Result<()> {
     let spread_sheet = sheets_api
         .get_spread_sheet(std::env::var("DOCUMENT_ID").expect("Need DOCUMENT_ID env"))
         .await?;
-    let sheet = spread_sheet.sheet_at(0);
+    let sheet = std::env::var("SHEET_NAME")
+        .map_err(|e| anyhow!(e))
+        .and_then(|name| {
+            spread_sheet
+                .sheet_by_title(name)
+                .ok_or(anyhow!("No sheet by that title"))
+        })
+        .unwrap_or_else(|_| spread_sheet.sheet_at(0));
     sheet.clear("A1:A999").await?;
     let members = client.get_member_list().await?;
     sheet
