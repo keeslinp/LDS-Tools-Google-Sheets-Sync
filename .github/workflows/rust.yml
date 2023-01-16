@@ -23,4 +23,4 @@ jobs:
       with:
         name: Binary
         path: |
-          "./target/release/lds-secretary"
+          target/release/lds-secretary
