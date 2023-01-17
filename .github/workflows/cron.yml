@@ -31,4 +31,7 @@ jobs:
       env:
         LDS_USERNAME: ${{ secrets.LDS_USERNAME }}
         LDS_PASSWORD: ${{ secrets.LDS_PASSWORD }}
+        GOOGLE_APPLICATION_CREDENTIALS: creds.json
+        DOCUMENT_ID: ${{ vars.DOCUMENT_ID }}
+        SHEET_NAME: ${{ vars.SHEET_NAME }}
       run: Binary/lds-secretary
