@@ -1,44 +1,31 @@
 use crate::urls::*;
-use playwright::Playwright;
+use anyhow::Result;
+use headless_chrome::{Browser, LaunchOptions};
 
-pub async fn get_token(
-    username: impl AsRef<str>,
-    password: impl AsRef<str>,
-) -> Result<String, playwright::Error> {
-    let playwright = Playwright::initialize().await?;
-    playwright.prepare()?;
-    let chromium = playwright.chromium();
-    let browser = chromium.launcher().headless(true).launch().await?;
-    let context = browser.context_builder().build().await?;
-    let page = context.new_page().await?;
-    page.goto_builder(SIGN_IN_URL).goto().await?;
-    page.fill_builder("input[name=\"username\"]", username.as_ref())
-        .fill()
-        .await?;
-    page.click_builder("input[type=\"submit\"]").click().await?;
-
-    page.fill_builder("input[name=\"password\"]", password.as_ref())
-        .fill()
-        .await?;
-    page.click_builder("input[type=\"submit\"]").click().await?;
-    // For some reason it isn't waiting properly for the nav to complete, so lets intentionally wait
-    page.wait_for_selector_builder("input[name=\"password\"]")
-        .state(playwright::api::frame::FrameState::Detached)
-        .wait_for_selector()
-        .await?;
-    page.goto_builder(MEMBER_LIST_URL)
-        .wait_until(playwright::api::DocumentLoadState::NetworkIdle)
-        .goto()
-        .await?;
-    let auth_token = page
-        .context()
-        .cookies(&[])
-        .await?
+pub fn get_token(username: impl AsRef<str>, password: impl AsRef<str>) -> Result<String> {
+    let browser = Browser::new(LaunchOptions::default_builder().headless(true).build()?)?;
+    let tab = browser.wait_for_initial_tab()?;
+    tab.navigate_to(SIGN_IN_URL)?;
+    tab.wait_until_navigated()?;
+    tab.wait_for_element("input[name=\"username\"]")?
+        .type_into(username.as_ref())?;
+    tab.wait_for_element("input[type=\"submit\"]")?.click()?;
+    tab.wait_for_element("input[name=\"password\"]")?
+        .type_into(password.as_ref())?;
+    tab.wait_for_element("input[type=\"submit\"]")?.click()?;
+    tab.wait_until_navigated()?;
+    tab.navigate_to(MEMBER_LIST_URL)?;
+    tab.wait_until_navigated()?;
+    let auth_token = tab
+        .get_cookies()?
         .iter()
         .find(|cookie| cookie.name == AUTH_COOKIE)
-        .expect("No auth cookie found")
+        .expect("No Auth cookie found")
         .value
         .clone();
-    browser.close().await?;
-    return Ok(auth_token);
+
+    // Leaving commented because for some reason this fails in headless mode.
+    // tab.close_target()?;
+
+    Ok(auth_token)
 }

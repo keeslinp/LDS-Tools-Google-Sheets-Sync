@@ -11,8 +11,7 @@ async fn main() -> Result<()> {
     let auth_token = auth::get_token(
         std::env::var("LDS_USERNAME").expect("Need LDS_USERNAME env"),
         std::env::var("LDS_PASSWORD").expect("Need LDS_PASSWORD env"),
-    )
-    .await?;
+    )?;
     let client = LDSApi::new(auth_token)?;
     let sheets_api = sheets::SheetsApi::new().await?;
     let spread_sheet = sheets_api

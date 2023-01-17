@@ -9,6 +9,8 @@ jobs:
     environment:
       name: Painted Mountain
     steps:
+    - uses: browser-actions/setup-chrome@latest
+    - run: chrome --version
     - name: Download artifact
       id: download-artifact
       uses: dawidd6/action-download-artifact@v2
