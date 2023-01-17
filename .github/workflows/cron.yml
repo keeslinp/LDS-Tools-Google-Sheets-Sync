@@ -25,7 +25,7 @@ jobs:
       id: write-creds
       env:
         CREDS_DATA: ${{ secrets.CREDS_DATA }}
-      run: echo $CREDS_DATA > conf.json
+      run: echo $CREDS_DATA > creds.json
     - name: Run Sync
       id: run-sync
       env:
